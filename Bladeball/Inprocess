@@ -49,6 +49,7 @@ local Tab2 = Window:NewTab("Visuals")
 local Tab3 = Window:NewTab("Ctates")
 local Tab4 = Window:NewTab("Cmds")
 local Tab5 = Window:NewTab("Credits")
+local Tab6 = Window:NewTab("Server")
 
 --// Sections
 
@@ -58,6 +59,7 @@ local crate = Tab3:NewSection("Sword And explosives crates")
 local cmds = Tab4:NewSection("Cmds (Players Can Notice Your Tag Use /hidetag)")
 local Credits = Tab5:NewSection("Credits")
 local Credits2 = Tab5:NewSection("Made By TwiRwal")
+local server = Tab6:NewSection("Server")
 
 --// Discord
 Credits2:NewButton("Copy Discord Link", "https://discord.gg/invite/qknYQgXa", function()
@@ -65,153 +67,7 @@ setclipboard("https://discord.gg/invite/qknYQgXa")
     print("Clicked")
 end)
 
---// Fractions
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
-local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-local Workspace = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterGui = game:GetService("StarterGui")
-local Lighting = game:GetService("Lighting")
-local VirtualUser = game:GetService("VirtualUser")
-local CoreGui = game:GetService("CoreGui")
-local TeleportService = game:GetService("TeleportService")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local ContextActionService = game:GetService("ContextActionService")
-local HttpService = game:GetService("HttpService")
-local Mouse = LocalPlayer:GetMouse()
-local abilitiesFolder = Character:WaitForChild("Abilities")
-local Playerparry = LocalPlayer or Players.PlayerAdded:Wait()
-local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9)
-local Balls = Workspace:WaitForChild("Balls", 9e9)
-
-function getExplosion()
-    local _, explosion = ReplicatedStorage.Remotes.Store.RequestOpenExplosionBox:InvokeServer()
-    return explosion
-end
-
-function getSword()
-    local _, sword = ReplicatedStorage.Remotes.Store.RequestOpenSwordBox:InvokeServer()
-    return sword
-end
-
-function Unbox(box)
-    if ChangeWebhook then
-        request({
-            Url = ChangeWebhookURL,
-            Method = "POST",
-            Headers = {
-                ["Content-Type"] = "application/json"
-            },
-            Body = game.HttpService:JSONEncode({
-                content = "You Unboxed " ..box()
-           })
-        })
-    else
-        sendnotification("You Unboxed " ..box(), true)
-    end
-end
-
-function equipability()
-    ReplicatedStorage.Remotes.Store.RequestEquipAbility:InvokeServer(ChangeEquipAbility)
-
-    ReplicatedStorage.Remotes.Store.GetOwnedAbilities:InvokeServer()
-
-    ReplicatedStorage.Remotes.kebaind:FireServer()
-                
-    local function AbilityValue2()
-        local TruValue = Instance.new("StringValue")
-        Workspace:FindFirstChild("AbilityThingyk1212"):Remove()
-           TruValue.Parent = Workspace
-           TruValue.Name = "AbilityThingyk1212"
-           TruValue.Value = ChangeEquipAbility
-        end
-
-        for i,v in pairs(abilitiesFolder:GetChildren()) do
-            for i,b in pairs(abilitiesFolder:GetChildren()) do
-                local Ability = b
-                
-                if v.Enabled == true then
-                    local EquippedAbility = v
-                    local ChosenAbility = {}
-                    spawn(function()
-                    ChosenAbility = AbilityValue2()
-                end)
-            
-                task.wait(0.05)
-                local AbilityValue = workspace.AbilityThingyk1212
-                if b.Name == AbilityValue.Value then
-                    v.Enabled = false
-                    b.Enabled = true
-                end
-            end
-        end
-    end
-end
-
-function VerifyBall(Ball)
-    if typeof(Ball) == "Instance" and Ball:IsA("BasePart") and Ball:IsDescendantOf(Balls) and Ball:GetAttribute("realBall") == true then
-        return true
-    end
-end
-
-function IsTarget()
-    return (Playerparry.Character and Playerparry.Character:FindFirstChild("Highlight"))
-end
-
-function Parry()
-    Remotes:WaitForChild("ParryButtonPress"):Fire()
-end
-
-local TruValue = Instance.new("StringValue")
-if Workspace:FindFirstChild("AbilityThingyk1212") then
-    Workspace:FindFirstChild("AbilityThingyk1212"):Remove()
-    task.wait(0.1)
-    TruValue.Parent = game:GetService("Workspace")
-    TruValue.Name = "AbilityThingyk1212"
-    TruValue.Value = "Dash"
-else
-    TruValue.Parent = game:GetService("Workspace")
-    TruValue.Name = "AbilityThingyk1212"
-    TruValue.Value = "Dash"
-end
-
-Balls.ChildAdded:Connect(function(Ball)
-    if ChangeAutoParry == true then
-        if not VerifyBall(Ball) then return end
-        
-        print(`Ball Spawned: {Ball}`)
-        
-        local OldPosition = Ball.Position
-        local OldTick = tick()
-        
-        Ball:GetPropertyChangedSignal("Position"):Connect(function()
-            if IsTarget() then
-                local Distance = (Ball.Position - workspace.CurrentCamera.Focus.Position).Magnitude
-                local Velocity = (OldPosition - Ball.Position).Magnitude
-                
-                print(`Distance: {Distance}\nVelocity: {Velocity}\nTime: {Distance / Velocity}`)
-            
-                if (Distance / Velocity) <= 10 then
-                    Parry()
-                end
-            end
-            
-            if (tick() - OldTick >= 1/60) then
-                OldTick = tick()
-                OldPosition = Ball.Position
-            end
-        end)
-    end
-end)
-
 -- Server
-
-local Tab6 = Window:NewTab("Server")
-local server = Tab6:NewSection("Server")
 
 server:NewToggle("RTX Shaders", "", function(value)
     if Value then
